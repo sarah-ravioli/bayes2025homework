@@ -3,15 +3,13 @@
 
 ## This homework has two parts:
 
-1 -- Simulate data a linear regression problem (continuous predictor and response variables) of your choice and show you can return the parameters you set. Your n should be 50 and you set your error (sigma) to a level you would expect in an ecological study. 
+1 -- Simulate data a linear regression problem (continuous predictor and response variables) of your choice and show you can return the parameters you set. Your n should be 100 and you set your error (sigma) to a level you would expect in an ecological study. 
 
 Next, add a binary covariate (for example, a treatment and control) to your dataset that interacts with your other predictor variable. Make the effect size of this interaction HALF the effect size of the first predictor variable, and again test how well you can return the parameter values.
 
-Now, using just 25% of your data, see how well you can return the parameters you set.
+Now, using just 20% of your data, see how well you can return the parameters you set.
 
-Make a plot of sampling from your data from 1 to the n 
-
-your data showing the estimated parameters for each sample size. Compare how well the model does across the different parameters. Which is better or worse at and why?
+Make a plot of sampling from your data from 1 to the n of your data (100) showing the estimated parameters for each sample size. Compare how well the model does across the different parameters. Which is better or worse at and why?
 
 Now, repeat the above but change your error term by 50%. Compare these results to what you found before and explain why you think they changed. 
 
