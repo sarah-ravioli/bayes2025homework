@@ -26,7 +26,7 @@ Challenge B -- Add an additional binary treatment (so you have treatment 1 which
 
 Challenge C -- Repeat step 3, but also extract an estimate of uncertainty from your posterior (e.g., 50% uncertainty intervals) and plot the results. 
 
-4 -- Review the sample datasets and pick one you want to use to go through the complete workflow with (which is the homework for next week). Ideally, you'll get to work on that one, but I may ask people to pick a new one so everyone is not using the same one. 
+4 -- Review the [sample datasets](https://github.com/temporalecologylab/bayes2025homework/blob/main/analyses/datasetsbayes.R) and pick one you want to use to go through the complete workflow with (which is the homework for next week). Ideally, you'll get to work on that one, but I may ask people to pick a new one so everyone is not using the same one. 
 
 
 ## How long should my answers be?
