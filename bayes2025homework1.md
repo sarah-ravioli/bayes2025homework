@@ -1,31 +1,46 @@
 # Homework 1: 
 ## Assigned 15 January 2025
 
-## This homework has two parts:
+## This homework has four parts:
 
-1 -- Simulate data a linear regression problem (continuous predictor and response variables) of your choice and show you can return the parameters you set. Your n should be 100 and you set your error (sigma) to a level you would expect in an ecological study. 
+1 -- Simulate data for a linear regression problem (continuous predictor and response variables) of your choice and show a linear model can return the parameters you set. Your n should be 100 and you should set your error (sigma) to a level you would expect in an ecological or evolutionary biology study. 
 
 Next, add a binary covariate (for example, a treatment and control) to your dataset that interacts with your other predictor variable. Make the effect size of this interaction HALF the effect size of the first predictor variable, and again test how well you can return the parameter values.
 
-Now, using just 20% of your data, see how well you can return the parameters you set.
+Step 2 -- Building on the above example, let's look at how the estimates of parameters returned from your linear model change with sample size, and make our analyses a little more robust. 
 
-Make a plot of sampling from your data from 1 to the n of your data (100) showing the estimated parameters for each sample size. Compare how well the model does across the different parameters. Which is better or worse at and why?
+Using just 20% of your data, see how well you can return the parameters you set.
 
-Now, repeat the above but change your error term by 50%. Compare these results to what you found before and explain why you think they changed. 
+Next, let's make a plot of sampling from your data from 1 to the n of your data (100) showing the estimated parameters for each sample size. Make a plot with your 1:100 on the horizontal axis and your estimated parameters on the vertical (you need either as many plots as parameters or a way to show all the different parameters
+ on one plot). Compare how well the model does across the different parameters. Which is better or worse at and why? 
 
-2 -- Review the sample datasets and pick one you want to use to go through the complete workflow with (which is the homework for next week). Ideally, you'll get to work on that one, but I may ask people to pick an new one so everyone is not using the same one. 
+Let's improve our sampling now. So far we have take just ONE draw from our set of parameters which means our sigma term has some Monte Carlo error in it, so let's take 10 draws each time (so we need to set up a loop or such in R that samples from 1:n and _at each step it repeats simulating the data and getting the estimates 10 times_). Re-make your plot. (If you get stuck here for a while, don't panic, but move onto Steps 3-4.)
+
+Step 3 -- Now, repeat the above but change your error term by 50%. Compare these results to what you found before and explain why you think they changed. 
+
+**Challenge Options** (optionals extra tasks to add if you finish this quickly and are unsurprised by the results): 
+
+Challenge A -- Make your treatment have three levels (control, treatment 1, treatment 2) and use the dummy variable approach to repeat the above steps. 
+
+Challenge B -- Add an additional binary treatment (so you have treatment 1 which has control and treatment levels and you add a treatment 2 which also has control and treatment levels) in a full factorial design with treatment 1 and repeat the above steps including all two-way and three-way interactions. 
+
+Challenge C -- Repeat step 3, but also extract an estimate of uncertainty from your posterior (e.g., 50% uncertainty intervals) and plot the results. 
+
+4 -- Review the sample datasets and pick one you want to use to go through the complete workflow with (which is the homework for next week). Ideally, you'll get to work on that one, but I may ask people to pick a new one so everyone is not using the same one. 
 
 
 ## How long should my answers be?
 Your answers should be BRIEF. We'll review the homework in class on Tuesday. 
 
 ### What file types can I submit?
-I prefer .R or .Rmd for code, but Quarto works too. If you use R then you can write answers with comments or submit a separate .md or .txt file with your answers. Please inculde all requested plots and complete code (do overwrite code to do the last step). Compile your qmd and md files and submit the html or pdf with the .md and .qmd.
+I prefer .R or .Rmd for code, but Quarto works too. If you use R then you can write answers with comments or submit a separate .md or .txt file with your answers. Please include all requested plots and complete code (do overwrite code to do the last step). Compile your qmd and md files and submit the html or pdf with the .md and .qmd.
+
+(Do you happen to be writing your code in Word or Google Docs? Don't worry, many good scientists have done this, but now would be the time to stop.)
 
 ### What models should I fit?
-You can use basic lm (`lm`) or the lm from rstanarm (`stan_lm`). Either way, use the mean point estimates for this exercize. 
+Use rstanarm (`stan_glm`). Either way, use the mean point estimates for this exercise. If your model does not converge **do not report the results** just record `NA` for that output. Rstanarm vignette [here](https://cran.r-project.org/web/packages/rstanarm/vignettes/rstanarm.html).
 
-# Due 21 January 2025 before the start of class
+# Due 20 January 2025 by 3pm
 
 ### Submit how? If you are enrolled in class, you must submit homework.
 You can submit via Canvas or GitHub. To submit on GitHub:
@@ -36,4 +51,6 @@ You can submit via Canvas or GitHub. To submit on GitHub:
 
 3. Push to GitHub or submit a pull request. 
 
-If you're auditig you don't have to submit your homework, but I still recommend it. 
+If you submit on Canvas, follow steps 1-2, then compress your folder and upload it via the assignment. 
+
+If you're auditing you don't have to submit your homework, but I still highly recommend doing it (it will test your skills in the course and make it easier for you to enjoy the homework review in class each week). You're welcome to submit your homework to me if you are auditing the course.  

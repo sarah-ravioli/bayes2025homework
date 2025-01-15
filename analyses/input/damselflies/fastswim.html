@@ -11,7 +11,7 @@
 
 
 
-<title>bayes2025homework1</title>
+<title>fastswim</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -358,107 +358,38 @@ display: none;
 </div>
 
 
-<div id="homework-1" class="section level1">
-<h1>Homework 1:</h1>
-<div id="assigned-15-january-2025" class="section level2">
-<h2>Assigned 15 January 2025</h2>
-</div>
-<div id="this-homework-has-four-parts" class="section level2">
-<h2>This homework has four parts:</h2>
-<p>1 – Simulate data for a linear regression problem (continuous
-predictor and response variables) of your choice and show a linear model
-can return the parameters you set. Your n should be 100 and you should
-set your error (sigma) to a level you would expect in an ecological or
-evolutionary biology study.</p>
-<p>Next, add a binary covariate (for example, a treatment and control)
-to your dataset that interacts with your other predictor variable. Make
-the effect size of this interaction HALF the effect size of the first
-predictor variable, and again test how well you can return the parameter
-values.</p>
-<p>Step 2 – Building on the above example, let’s look at how the
-estimates of parameters returned from your linear model change with
-sample size, and make our analyses a little more robust.</p>
-<p>Using just 20% of your data, see how well you can return the
-parameters you set.</p>
-<p>Next, let’s make a plot of sampling from your data from 1 to the n of
-your data (100) showing the estimated parameters for each sample size.
-Make a plot with your 1:100 on the horizontal axis and your estimated
-parameters on the vertical (you need either as many plots as parameters
-or a way to show all the different parameters on one plot). Compare how
-well the model does across the different parameters. Which is better or
-worse at and why?</p>
-<p>Let’s improve our sampling now. So far we have take just ONE draw
-from our set of parameters which means our sigma term has some Monte
-Carlo error in it, so let’s take 10 draws each time (so we need to set
-up a loop or such in R that samples from 1:n and <em>at each step it
-repeats simulating the data and getting the estimates 10 times</em>).
-Re-make your plot. (If you get stuck here for a while, don’t panic, but
-move onto Steps 3-4.)</p>
-<p>Step 3 – Now, repeat the above but change your error term by 50%.
-Compare these results to what you found before and explain why you think
-they changed.</p>
-<p><strong>Challenge Options</strong> (optionals extra tasks to add if
-you finish this quickly and are unsurprised by the results):</p>
-<p>Challenge A – Make your treatment have three levels (control,
-treatment 1, treatment 2) and use the dummy variable approach to repeat
-the above steps.</p>
-<p>Challenge B – Add an additional binary treatment (so you have
-treatment 1 which has control and treatment levels and you add a
-treatment 2 which also has control and treatment levels) in a full
-factorial design with treatment 1 and repeat the above steps including
-all two-way and three-way interactions.</p>
-<p>Challenge C – Repeat step 3, but also extract an estimate of
-uncertainty from your posterior (e.g., 50% uncertainty intervals) and
-plot the results.</p>
-<p>4 – Review the sample datasets and pick one you want to use to go
-through the complete workflow with (which is the homework for next
-week). Ideally, you’ll get to work on that one, but I may ask people to
-pick a new one so everyone is not using the same one.</p>
-</div>
-<div id="how-long-should-my-answers-be" class="section level2">
-<h2>How long should my answers be?</h2>
-<p>Your answers should be BRIEF. We’ll review the homework in class on
-Tuesday.</p>
-<div id="what-file-types-can-i-submit" class="section level3">
-<h3>What file types can I submit?</h3>
-<p>I prefer .R or .Rmd for code, but Quarto works too. If you use R then
-you can write answers with comments or submit a separate .md or .txt
-file with your answers. Please include all requested plots and complete
-code (do overwrite code to do the last step). Compile your qmd and md
-files and submit the html or pdf with the .md and .qmd.</p>
-<p>(Do you happen to be writing your code in Word or Google Docs? Don’t
-worry, many good scientists have done this, but now would be the time to
-stop.)</p>
-</div>
-<div id="what-models-should-i-fit" class="section level3">
-<h3>What models should I fit?</h3>
-<p>Use rstanarm (<code>stan_glm</code>). Either way, use the mean point
-estimates for this exercise. If your model does not converge <strong>do
-not report the results</strong> just record <code>NA</code> for that
-output. Rstanarm vignette <a href="https://cran.r-project.org/web/packages/rstanarm/vignettes/rstanarm.html">here</a>.</p>
-</div>
-</div>
-</div>
-<div id="due-20-january-2025-by-3pm" class="section level1">
-<h1>Due 20 January 2025 by 3pm</h1>
-<div id="submit-how-if-you-are-enrolled-in-class-you-must-submit-homework." class="section level3">
-<h3>Submit how? If you are enrolled in class, you must submit
-homework.</h3>
-<p>You can submit via Canvas or GitHub. To submit on GitHub:</p>
-<ol style="list-style-type: decimal">
-<li><p>Make a folder (name it your first name, all lowercase letters) in
-homeworksubmitted/</p></li>
-<li><p>Put your analyses and any output there, format the code so it
-runs from the repo without additional files.</p></li>
-<li><p>Push to GitHub or submit a pull request.</p></li>
-</ol>
-<p>If you submit on Canvas, follow steps 1-2, then compress your folder
-and upload it via the assignment.</p>
-<p>If you’re auditing you don’t have to submit your homework, but I
-still highly recommend doing it (it will test your skills in the course
-and make it easier for you to enjoy the homework review in class each
-week). You’re welcome to submit your homework to me if you are auditing
-the course.</p>
+<div id="swimming-damselfiles" class="section level1">
+<h1>Swimming damselfiles</h1>
+<p>This is a dataset of damselfly swimming performance that is the basis
+for a few papers from the late 1990’s-2005 by Mark McPeek and
+colleagues. They were looking for species differences. Many of these
+also scale with “size” (i.e., wet mass here).</p>
+<div id="the-variables-are" class="section level3">
+<h3>The variables are:</h3>
+<p>Species - obviously. You can probably figure out my codes by going to
+the Odonata Central website and looking at the list of Enallagma. The
+species code is E + first three letters of the specific epithet (e.g.,
+Easp = Enallagma aspersum). There’s also Ischura verticalis (Iver) and
+Chromargion conditum (Ccon).</p>
+<p>Individ - individual number</p>
+<p>Wetmass - wet mass in mgs</p>
+<p>Speed - fastest swim of three (this was the response variable - how
+fast could the individual swim)</p>
+<p>Swimbeat - rate at which it wagged its abdomen to generate thrust
+during fastest swim</p>
+<p>Tailamp - maximum amplitude during tail beat</p>
+<p>LDH - enzyme kinetic rate of the enzyme Lactate dehydrogenase
+(searching for biochemical causes of swim speed)</p>
+<p>PK - enzyme kinetic rate for pyruvate kinase</p>
+<p>AK - enzyme kinetic rate for arginine kinase (this was the keeper for
+swimming across species)</p>
+<p>Area - surface area of abdominal lamellae used to generate thrust
+during swimming (average of three)</p>
+<p>Perim - perimeter of abdominal lamellae</p>
+<p>MajAxis - major axis length of abdominal lamellae</p>
+<p>Breadth - longest distance across lamellae perpendicular to major
+axis. i.e., width.</p>
+<p>. and -9999 are missing data</p>
 </div>
 </div>
 
