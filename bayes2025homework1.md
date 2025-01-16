@@ -49,7 +49,7 @@ You can submit via Canvas or GitHub. To submit on GitHub:
 
 2. Put your analyses and any output there, format the code so it runs from the repo without additional files.
 
-3. Push to GitHub or submit a pull request. 
+3. Submit this as [a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request). 
 
 If you submit on Canvas, follow steps 1-2, then compress your folder and upload it via the assignment. 
 
