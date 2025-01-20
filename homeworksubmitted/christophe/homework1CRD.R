@@ -14,7 +14,7 @@ library(arm)
 #### Step 1. Simulate data ####
 # === === === === === === === === === === === === === === === === 
 
-### My linear regression will analyse how growth increment (mm) is affected by the number of days in the growing season
+### My linear regression will  analyse how growth increment (mm) is affected by the number of days in the growing season
 ### Predictor variable : number of days
 ### Response variable : growth in increment in ring width (mm)
 n <- 100
