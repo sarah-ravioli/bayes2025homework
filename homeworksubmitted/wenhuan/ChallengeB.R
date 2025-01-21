@@ -1,7 +1,7 @@
 library(rstanarm)
 
 set.seed(123)
-
+ 
 # Set sample size
 n <- 100
 a <- 1 # Intercept
