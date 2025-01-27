@@ -1,0 +1,265 @@
+---
+title: "homework2"
+author: "sarah ravoth"
+date: "2025-01-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# set libraries
+library(tidyverse)
+library(data.table) # for fread()
+library(rstanarm)
+library(shinystan)
+```
+
+```{r}
+fastswim <- fread("analyses/input/damselflies/fastswim.dta") 
+fastswim[fastswim == "."] <- NA # Replace . with NA in all columns
+fastswim[fastswim == -9999] <- NA # Replace -9999 with NA in all columns
+head(fastswim) # check
+glimpse(fastswim) # check
+```
+
+### step 1: come up with a model
+
+question: how does lamellae surface area affect damselfly swimming speed? i imagine that lamellae area affects swimming speed, since they are used to generate thrust. while different species might have systematic differences in lamellae size and/or swimming speed, they are all generally related, ie. this speed ~ area relationship is drawn from the same distribution, with some idiosyncracy between species.
+
+```{r, echo=FALSE}
+fastswim %>% 
+  mutate(area = as.numeric(area), 
+         speed = as.numeric(speed)) %>% 
+  ggplot(aes(x=area, y=speed, col=species)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE)
+```
+
+
+yhat[sp].i = a[sp] + b[sp]*x[sp].i
+y[sp].i = normal(yhat[sp].i, sigmay[sp])
+
+so every species should have a unique intrcept, slope, error estimate
+
+### step 2: simulate data 
+test if you can simulate data for the model & how well you get parameters back. a well running model = no divergences, Rhat close to 1, good Neffective.
+
+some plots, looking at empirical data characteristics:
+```{r}
+length(unique(fastswim$species)) # 16 unique species
+nrow(fastswim) # total 565 rows
+fastswim %>% 
+  group_by(species) %>% 
+  summarise(n()) # number of obs per species, min=8, max=84
+
+hist(as.numeric(fastswim$area))
+hist(as.numeric(fastswim$speed))
+hist(as.numeric(fastswim$area[fastswim$species=="Ebor"]))
+hist(as.numeric(fastswim$area[fastswim$species=="Egem"]))
+hist(as.numeric(fastswim$area[fastswim$species=="Ediv"]))
+```
+
+simulate a dataset:
+```{r, set.seed(7)}
+# set number of spp 
+nspp <- 16 
+
+# set parameters
+alphamu <- 7
+alphasigma <- 3
+betamu <- 2
+betasigma <- 1
+sigmay <- 5
+parameters <- c(alphamu, alphasigma, betamu, betasigma, sigmay)
+
+# set hyper priors
+alphaspp <- rnorm(nspp, alphamu, alphasigma)
+betaspp <- rnorm(nspp, betamu, betasigma)
+
+# simulate dataset 
+obs_per_spp <- round(runif(nspp, 8, 84)) # the number of obs/reps per spp varies btwn min=8 & max=84
+species_id <- rep(1:nspp, obs_per_spp) # make a vector of spp ID, rep'd by # of times they appear in df
+n <- length(species_id) # length of the df
+individual <- 1:n
+area <- abs(rnorm(n, mean=4, sd=3)) # abs() wrapper so that no values are <0
+
+# simulate y data 
+ypred <- rep(NA, n)
+
+for(i in 1:n){
+  sp <- species_id[i]   # set the species ID to get intercept + slope parameters
+  ypred[i] <- alphaspp[sp] + betaspp[sp]*area[i] # i calls a given value in the vector, sp calls the appropriate spp ID corresponding to a hyper prior
+}
+
+# now set y (aka speed)
+speed <- rnorm(n, ypred, sigmay)
+
+# put everything in a df 
+sim_dat <- data.frame(species_id, individual, area, speed) %>% 
+  mutate(species_id = as.factor(species_id)) # change from numeric to factor
+```
+
+check simulated data by plotting:
+```{r, echo=FALSE}
+# check data by plotting
+hist(area)
+hist(speed) 
+# the real data is more right skewed, but this is actually pretty close 
+
+# plot relationship btwn 2 predictors
+sim_dat %>% 
+  ggplot(aes(x=area, y=speed, col=species_id)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE) # ok 
+```
+
+here i fit a model to my simulated data to see how well i recover parameters set above. generally the model ran well--there were no divergences and rhat=1.0 for all parameters.however, i was getting low n_eff using the default number of iterations (2000 iterations per chain pre warm up, 1000 per chain post warm up). so, i had to increase the number of pre-warm up iterations to 4000 per chain to get sufficient n_eff, which might indicate issues searching parameter space when there are fewer iterations. looking at the chain plots, i can tell there's some issues searching parameter space (eg. flat spots), so i might consider increasing iterations more/increasing number of warm up iterations if i was actually going to use these models.
+
+in terms of parameter estimates, the overall intercept and species slopes were well estimated, but the species-specific intercept estimates were quite poor. sigmay was better estimated than the hyper parameter sigmas.
+
+reminder of parameter values
+alphamu <- 7
+alphasigma <- 3
+betamu <- 2
+betasigma <- 1
+sigmay <- 5
+
+```{r, results="hide"}
+# note: hiding results so it doesn't print big list
+# random slopes AND intercept model
+sim_mod <- stan_lmer(speed ~ area|species_id, data=sim_dat, iter=4000) # set 3000 instead of default 2000 iter per chain pre-warm up
+```
+
+```{r}
+summary(sim_mod)
+# launch_shinystan(sim_mod) # i looked at this!
+alphaspp
+betaspp
+```
+
+### step 3 (optional): prior predictive checks
+
+first checking whether i believe the relationship btwn x & y in the simulated data. x variable (area) looks good, takes values btwn 0-15, which makes sense. the y variable does NOT have reasonable values--it takes some negative values, which is not possible. also, some of the speed ~ area relationships are negative--i might believe a flat relationship, but i don't really believe a negative one, since if lamellae generate thrust, then they should increase speed. UNLESS having large lamellae area correlates more strongly with another trait that decreases speed, more than area correlates with speed, but not really relevant to simple example i'm doing here...
+
+i think my betamu and betasigma values need to be decreased a smidge, and i need to make sure the speed > 0 always (i think this is the fault of the intercept prior). but i think that it's probably that the relationship btwn area & speed is larger than 1:1, ie. that 1 unit increase in area should generate >1 unit increases in speed.
+
+```{r, echo=FALSE}
+sim_dat %>% 
+  ggplot(aes(x=area, y=speed, col=species_id)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE) # ok 
+```
+
+re-try with smaller betamu, betasigma, alphasigma parameters, but increase alphamu. 
+```{r, set.seed(777)}
+# set number of spp 
+nspp <- 16 
+
+# set parameters
+alphamu <- 12
+alphasigma <- 1.5
+betamu <- 1.7
+betasigma <- 0.5
+sigmay <- 5
+parameters <- c(alphamu, alphasigma, betamu, betasigma, sigmay)
+
+# set hyper priors
+alphaspp <- rnorm(nspp, alphamu, alphasigma)
+betaspp <- rnorm(nspp, betamu, betasigma)
+
+# simulate dataset 
+obs_per_spp <- round(runif(nspp, 8, 84)) # the number of obs/reps per spp varies btwn min=8 & max=84
+species_id <- rep(1:nspp, obs_per_spp) # make a vector of spp ID, rep'd by # of times they appear in df
+n <- length(species_id) # length of the df
+individual <- 1:n
+area <- abs(rnorm(n, mean=4, sd=3)) # abs() wrapper so that no values are <0
+
+# simulate y data 
+ypred <- rep(NA, n)
+
+for(i in 1:n){
+  sp <- species_id[i]   # set the species ID to get intercept + slope parameters
+  ypred[i] <- alphaspp[sp] + betaspp[sp]*area[i] # i calls a given value in the vector, sp calls the appropriate spp ID corresponding to a hyper prior
+}
+
+# now set y (aka speed)
+speed <- rnorm(n, ypred, sigmay)
+
+# put everything in a df 
+sim_dat2 <- data.frame(species_id, individual, area, speed) %>% 
+  mutate(species_id = as.factor(species_id)) # change from numeric to factor
+```
+
+```{r, echo=FALSE}
+sim_dat2 %>% 
+  ggplot(aes(x=area, y=speed, col=species_id)) +
+  geom_point() +
+  geom_smooth(method="lm", se=FALSE) # ok 
+```
+this looks much better.
+
+now i will check each prior individually.
+alphamu <- 12
+alphasigma <- 1.5
+betamu <- 1.7
+betasigma <- 0.5
+sigmay <- 5
+
+for slope parameter:
+i think this is reasonable--nothing below 0, and i think the variance is reasonable--ie a reasonable range is covered, without crazy high values (eg. i wouldn't believe a slope >5).
+```{r}
+reps_ppc <- 1000 # set the number of reps 
+beta_prior <- rnorm(reps_ppc, betamu, betasigma) # generate
+hist(beta_prior) # plot
+```
+
+for intercept parameter:
+also feel good abt this (same reasoning as above).
+```{r}
+reps_ppc <- 1000 # set the number of reps 
+alpha_prior <- rnorm(reps_ppc, alphamu, alphasigma) # generate
+hist(alpha_prior) # plot
+```
+
+for sigmay parameter:
+i'm not really sure what the sigma of my sigmaymu is...but this seems to be a good range?? i wouldn't believe a sigmay value above 8...
+```{r}
+sigmay_mu <- 5
+sigmay_sigma <- 1
+reps_ppc <- 1000 # set the number of reps 
+sigmay_prior <- rnorm(reps_ppc, sigmay_mu, sigmay_sigma) # generate
+hist(sigmay_prior) # plot
+```
+
+i will continue with the prior values:
+alphamu <- 12
+alphasigma <- 1.5
+betamu <- 1.7
+betasigma <- 0.5
+sigmay <- 5
+
+### step 4: run model with empirical data
+a well running model = no divergences, Rhat close to 1, good Neffective.
+
+rhat ok, but i was having trouble getting high enough n_eff and had some warnings of divergent transitions, so i upped the iteration & warmup values.
+
+```{r, results="hide"}
+# note: hiding results so it doesn't print big list
+
+fastswim <- fastswim %>%
+  mutate(species = as.factor(species),  # make sure grouping var is factor, x & y are numeric
+         speed = as.numeric(speed), 
+         area = as.numeric(area))
+
+emp_mod <- stan_lmer(speed ~ area|species, data=fastswim, iter=6000, warmup=4000) # set iterations to 4000, i know that i need for decent n_eff
+```
+
+inspect output:
+```{r}
+summary(emp_mod)
+# launch_shinystan(emp_mod) # i looked at this!
+```
+
+### step 5 (optional): retrodictive checks
+did not do this step.
